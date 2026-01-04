@@ -1,13 +1,14 @@
 package gui.base.enums;
 
-public enum  CamisetaMaterialENUM {
-    ALGODON("Algodón"),
-    POLIESTER("Poliester");
+public enum tazaDiseñoENUM {
+    TEXTO("Texto"),
+    DIBUJO("Dibujo");
 
     private String valor;
 
-    CamisetaMaterialENUM(String valor){
+    tazaDiseñoENUM(String valor){
         this.valor=valor;
+
     }
     public String getValor(){
         return valor;

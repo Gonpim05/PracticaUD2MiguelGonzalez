@@ -1,5 +1,7 @@
 package gui;
 
+import com.github.lgooddatepicker.components.DatePicker;
+
 import javax.swing.*;
 
 public class Vista {
@@ -47,4 +49,5 @@ public class Vista {
     private JButton modificarEnvioButton;
     private JButton eliminarEnvioButton;
     private JTable tablaEnvio;
+    private DatePicker datePicker;
 }
