@@ -2,22 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4a9aa6be-7b3d-40fb-9629-5e183696a760" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/gui/base/enums/LlaveroColorENUM.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/base/enums/LlaveroFormaENUM.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/base/enums/LlaveroMaterialENUM.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/base/enums/TazaColorENUM.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/base/enums/TazaMaterialENUM.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/base/enums/TazaMetodoDiseñoENUM.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/base/enums/TazaTamañoENUM.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/base/enums/tazaDiseñoENUM.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/Controlador.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Controlador.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/Modelo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Modelo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/Vista.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Vista.form" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/Vista.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Vista.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/base/enums/CamisetaColorENUM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/base/enums/CamisetaColorENUM.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/base/enums/CamisetaMaterialENUM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/base/enums/CamisetaMaterialENUM.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/base/enums/CamisetaTallaENUM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/base/enums/CamisetaTallaENUM.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/Principal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Principal.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -85,7 +75,9 @@
       <workItem from="1767361549914" duration="4695000" />
       <workItem from="1767437083536" duration="3678000" />
       <workItem from="1767453168427" duration="1641000" />
-      <workItem from="1767519278320" duration="4508000" />
+      <workItem from="1767519278320" duration="4683000" />
+      <workItem from="1767557550019" duration="605000" />
+      <workItem from="1767610162340" duration="4226000" />
     </task>
     <servers />
   </component>

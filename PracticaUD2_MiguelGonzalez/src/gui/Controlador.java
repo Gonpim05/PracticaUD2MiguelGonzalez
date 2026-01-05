@@ -22,6 +22,18 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         iniciar();
     }
 
+    private void refrescarTodo() {
+        refrescarCamisetas();
+        refrescarTazas();
+        refrescarLlaveros();
+        refrescarDatos();
+        refrescar = false;
+    }
+
+    private void addActionListeners(ActionListener listener) {
+        vista.añadirCamiseta
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
