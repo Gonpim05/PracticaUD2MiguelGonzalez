@@ -9,7 +9,7 @@ public class Modelo {
     private String user;
     private String password;
     private String adminPassword;
-    private String dbName;
+    private String dbName = "bdd_regalosPers";
 
     private Connection conexion;
 
@@ -23,62 +23,29 @@ public class Modelo {
     public String getAdminPassword() { return adminPassword; }
     public Connection getConexion() { return conexion; }
 
-
-    private void getPropValues() {
-        Properties prop = new Properties();
-        try (FileInputStream fis = new FileInputStream("config.properties")) {
-            prop.load(fis);
-
-            // Asignamos los valores del archivo a tus variables
-            this.ip = prop.getProperty("ip");
-            this.user = prop.getProperty("user");
-            this.password = prop.getProperty("pass");
-            this.adminPassword = prop.getProperty("admin");
-            this.dbName = prop.getProperty("db_name");
-
-        } catch (IOException e) {
-            System.err.println("Error: No se pudo leer config.properties");
-            e.printStackTrace();
-        }
-    }
-
-
-
     void conectar() {
         try {
             conexion = DriverManager.getConnection(
                     "jdbc:mysql://" + ip + ":3306/" + dbName, user, password);
             System.out.println("Conectado con éxito a " + dbName);
-
         } catch (SQLException sqle) {
-
             try {
                 conexion = DriverManager.getConnection(
                         "jdbc:mysql://" + ip + ":3306/", user, password);
-
                 PreparedStatement statement = null;
-
-                // Leemos tu archivo específico
                 String code = leerFichero();
-
-                // Separamos por los guiones como hace tu profesora
                 String[] query = code.split("--");
-
                 for (String aQuery : query) {
                     if (!aQuery.trim().isEmpty()) {
                         statement = conexion.prepareStatement(aQuery);
                         statement.executeUpdate();
                     }
                 }
-
                 if (statement != null) {
                     statement.close();
                 }
-
-                // entrada base de datos
                 conexion.setCatalog(dbName);
                 System.out.println("Base de datos creada desde el script.");
-
             } catch (SQLException | IOException e) {
                 e.printStackTrace();
             }
@@ -89,56 +56,74 @@ public class Modelo {
         BufferedReader reader = new BufferedReader(new FileReader("bdd_regalosPers.sql"));
         String linea;
         StringBuilder stringBuilder = new StringBuilder();
-        while ((linea=reader.readLine())!=null){
+        while ((linea = reader.readLine()) != null) {
             stringBuilder.append(linea);
             stringBuilder.append(" ");
         }
+        reader.close();
         return stringBuilder.toString();
     }
 
-    void desconectar(){
+    void desconectar() {
         try {
-            conexion.close();
-            conexion=null;
-        } catch (SQLException sqle){
+            if (conexion != null) {
+                conexion.close();
+                conexion = null;
+            }
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
         }
     }
 
-    void insertarCamiseta(int idEnvio, String color, String material, String talla,
-                                 boolean conTexto, String diseñoTexto, int cantidad, float precio) {
+    // insertar
 
-        // 1. Añadimos precio_camiseta a la lista de columnas y un ? más en VALUES
-        String sentenciaSql = "INSERT INTO camiseta (idenvio, color, material, talla, con_texto, diseno_texto, cantidad, precio_camiseta) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
+    // AÑADIDO: Método para insertar el envío y obtener su ID (estilo profesora)
+    public int insertarEnvio(String dni, String nombre, String tfn, String comentario) {
+        String sentenciaSql = "INSERT INTO envios (dni_cliente, nombre_completo, telefono, comentario) VALUES (?, ?, ?, ?)";
         PreparedStatement sentencia = null;
+        int idGenerado = -1;
+        try {
+            sentencia = conexion.prepareStatement(sentenciaSql, Statement.RETURN_GENERATED_KEYS);
+            sentencia.setString(1, dni);
+            sentencia.setString(2, nombre);
+            sentencia.setString(3, tfn);
+            sentencia.setString(4, comentario);
+            sentencia.executeUpdate();
 
+            ResultSet rs = sentencia.getGeneratedKeys();
+            if (rs.next()) {
+                idGenerado = rs.getInt(1);
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        } finally {
+            if (sentencia != null) {
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
+            }
+        }
+        return idGenerado;
+    }
+
+    void insertarCamiseta(int idEnvio, String color, String material, String talla,
+                          boolean conTexto, String disenoTexto, int cantidad, float precio) {
+        String sentenciaSql = "INSERT INTO camiseta (idenvio, color, material, talla, con_texto, diseno_texto, cantidad, precio_camiseta) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement sentencia = null;
         try {
             sentencia = conexion.prepareStatement(sentenciaSql);
-
-            // 2. Asignamos los valores (ahora son 8 parámetros)
             sentencia.setInt(1, idEnvio);
             sentencia.setString(2, color);
             sentencia.setString(3, material);
             sentencia.setString(4, talla);
             sentencia.setBoolean(5, conTexto);
-            sentencia.setString(6, diseñoTexto);
+            sentencia.setString(6, disenoTexto);
             sentencia.setInt(7, cantidad);
             sentencia.setFloat(8, precio);
-
             sentencia.executeUpdate();
-            System.out.println("Camiseta añadida correctamente.");
-
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         } finally {
             if (sentencia != null) {
-                try {
-                    sentencia.close();
-                } catch (SQLException sqle) {
-                    sqle.printStackTrace();
-                }
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
     }
@@ -146,7 +131,6 @@ public class Modelo {
     void insertarTaza(int idEnvio, String color, String material, String tamano, String tipo_diseno, String metodo_diseno, int cantidad, float precio) {
         String sentenciaSql = "INSERT INTO taza (idenvio, color, material, tamano, tipo_diseno, metodo_diseno, cantidad, precio_taza) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement sentencia = null;
-
         try {
             sentencia = conexion.prepareStatement(sentenciaSql);
             sentencia.setInt(1, idEnvio);
@@ -157,18 +141,12 @@ public class Modelo {
             sentencia.setString(6, metodo_diseno);
             sentencia.setInt(7, cantidad);
             sentencia.setFloat(8, precio);
-
             sentencia.executeUpdate();
-            System.out.println("Taza añadida correctamente.");
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         } finally {
             if (sentencia != null) {
-                try {
-                    sentencia.close();
-                } catch (SQLException sqle) {
-                    sqle.printStackTrace();
-                }
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
     }
@@ -176,7 +154,6 @@ public class Modelo {
     void insertarLlavero(int idEnvio, String color, String material, String forma, int cantidad, float precio) {
         String sentenciaSql = "INSERT INTO llavero (idenvio, color, material, forma, cantidad, precio_llavero) VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement sentencia = null;
-
         try {
             sentencia = conexion.prepareStatement(sentenciaSql);
             sentencia.setInt(1, idEnvio);
@@ -185,29 +162,41 @@ public class Modelo {
             sentencia.setString(4, forma);
             sentencia.setInt(5, cantidad);
             sentencia.setFloat(6, precio);
-
             sentencia.executeUpdate();
-            System.out.println("Llavero añadido correctamente");
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         } finally {
             if (sentencia != null) {
-                try {
-                    sentencia.close();
-                } catch (SQLException sqle) {
-                    sqle.printStackTrace();
-                }
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
+            }
+        }
+    }
+
+    // modificar
+
+    void modificarEnvio(int idEnvio, String dni, String nombre, String tfn, String comentario) {
+        String sentenciaSql = "UPDATE envios SET dni_cliente = ?, nombre_completo = ?, telefono = ?, comentario = ? WHERE idenvio = ?";
+        PreparedStatement sentencia = null;
+        try {
+            sentencia = conexion.prepareStatement(sentenciaSql);
+            sentencia.setString(1, dni);
+            sentencia.setString(2, nombre);
+            sentencia.setString(3, tfn);
+            sentencia.setString(4, comentario);
+            sentencia.setInt(5, idEnvio);
+            sentencia.executeUpdate();
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        } finally {
+            if (sentencia != null) {
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
     }
 
     void modificarCamiseta(String color, String material, String talla, boolean conTexto, String diseno_texto, int cantidad, float precio, int idCamiseta) {
-
-        String sentenciaSql = "UPDATE camiseta SET color = ?, material = ?, talla = ?, con_texto = ?, diseno_texto = ?, cantidad = ?, precio_camiseta = ? " +
-                "WHERE idcamiseta = ?";
-
+        String sentenciaSql = "UPDATE camiseta SET color = ?, material = ?, talla = ?, con_texto = ?, diseno_texto = ?, cantidad = ?, precio_camiseta = ? WHERE idcamiseta = ?";
         PreparedStatement sentencia = null;
-
         try {
             sentencia = conexion.prepareStatement(sentenciaSql);
             sentencia.setString(1, color);
@@ -218,28 +207,20 @@ public class Modelo {
             sentencia.setInt(6, cantidad);
             sentencia.setFloat(7, precio);
             sentencia.setInt(8, idCamiseta);
-
             sentencia.executeUpdate();
-            System.out.println("Camiseta modificada correctamente.");
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         } finally {
             if (sentencia != null) {
-                try {
-                    sentencia.close();
-                } catch (SQLException sqle) {
-                    sqle.printStackTrace();
-                }
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
     }
 
     void modificarTaza(String color, String material, String tamano, String tipo_diseno, String metodo_diseno, int cantidad, float precio_taza, int idTaza){
-        String sentenciaSql = "UPDATE taza SET color = ?, material = ?, tamano = ?, tipo_diseno = ?,  metodo_diseno = ?, cantidad = ?, precio_taza = ?" + " WHERE idTaza = ?";
-
+        String sentenciaSql = "UPDATE taza SET color = ?, material = ?, tamano = ?, tipo_diseno = ?,  metodo_diseno = ?, cantidad = ?, precio_taza = ? WHERE idtaza = ?";
         PreparedStatement sentencia = null;
-
-        try{
+        try {
             sentencia = conexion.prepareStatement(sentenciaSql);
             sentencia.setString(1,color);
             sentencia.setString(2,material);
@@ -249,117 +230,199 @@ public class Modelo {
             sentencia.setInt(6,cantidad);
             sentencia.setFloat(7,precio_taza);
             sentencia.setInt(8, idTaza);
-
             sentencia.executeUpdate();
-            System.out.println("Taza modificada correctamente");
-
-        }catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }finally {
+        } finally {
             if (sentencia != null){
-                try {
-                    sentencia.close();
-                } catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
     }
 
     void modificarLlavero(String color, String material, String forma, int cantidad, float precio_llavero, int idLlavero){
-        String sentenciaSql = "UPDATE llavero SET color = ?, material = ?, forma = ?, cantidad = ?, precio_llavero = ?" + "WHERE idLlavero = ?";
-
+        String sentenciaSql = "UPDATE llavero SET color = ?, material = ?, forma = ?, cantidad = ?, precio_llavero = ? WHERE idllavero = ?";
         PreparedStatement sentencia = null;
-
         try {
-            sentencia=conexion.prepareStatement(sentenciaSql);
+            sentencia = conexion.prepareStatement(sentenciaSql);
             sentencia.setString(1,color);
             sentencia.setString(2,material);
             sentencia.setString(3,forma);
             sentencia.setInt(4,cantidad);
             sentencia.setFloat(5,precio_llavero);
             sentencia.setInt(6,idLlavero);
-
             sentencia.executeUpdate();
-            System.out.println("Llavero modificado correctamente");
-
-        }catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }finally {
+        } finally {
             if (sentencia != null){
-              try {
-                  sentencia.close();
-              }catch (SQLException sqle){
-                  sqle.printStackTrace();
-              }
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
+            }
+        }
+    }
+
+    // eliminar
+
+    void eliminarEnvio(int idEnvio) {
+        String sentenciaSql = "DELETE FROM envios WHERE idenvio = ?";
+        PreparedStatement sentencia = null;
+        try {
+            sentencia = conexion.prepareStatement(sentenciaSql);
+            sentencia.setInt(1, idEnvio);
+            sentencia.executeUpdate();
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        } finally {
+            if (sentencia != null) {
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
     }
 
     void eliminarCamiseta(int idCamiseta){
-        String sentenciaSql = "DELETE FROM camiseta WHERE idCamiseta = ?";
+        String sentenciaSql = "DELETE FROM camiseta WHERE idcamiseta = ?";
         PreparedStatement sentencia = null;
-
-        try{
-        sentencia =conexion.prepareStatement(sentenciaSql);
-        sentencia.setInt(1,idCamiseta);
-        sentencia.executeUpdate();
-        }catch (SQLException sqle){
+        try {
+            sentencia = conexion.prepareStatement(sentenciaSql);
+            sentencia.setInt(1,idCamiseta);
+            sentencia.executeUpdate();
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }finally {
-            if (sentencia!=null){
-                try{
-                    sentencia.close();
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
+        } finally {
+            if (sentencia != null){
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
     }
 
     void eliminarTaza(int idTaza){
-        String sentenciaSql = "DELETE FROM taza WHERE idTaza = ?";
+        String sentenciaSql = "DELETE FROM taza WHERE idtaza = ?";
         PreparedStatement sentencia = null;
-
         try {
-            sentencia=conexion.prepareStatement(sentenciaSql);
+            sentencia = conexion.prepareStatement(sentenciaSql);
             sentencia.setInt(1,idTaza);
             sentencia.executeUpdate();
-        }catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }finally {
-            if (sentencia!=null){
-                try {
-                    sentencia.close();
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
+        } finally {
+            if (sentencia != null){
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
     }
 
     void eliminarLlavero(int idLlavero){
-        String sentenciaSql = "DELETE FROM llavero WHERE idLlavero = ?";
+        String sentenciaSql = "DELETE FROM llavero WHERE idllavero = ?";
         PreparedStatement sentencia = null;
-
         try {
-            sentencia=conexion.prepareStatement(sentenciaSql);
+            sentencia = conexion.prepareStatement(sentenciaSql);
             sentencia.setInt(1,idLlavero);
             sentencia.executeUpdate();
-        }catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }finally {
-            if (sentencia!=null){
-                try {
-                    sentencia.close();
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
+        } finally {
+            if (sentencia != null){
+                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
     }
 
+    // consulta
 
+    ResultSet consultarEnvios() throws SQLException {
+        String sentenciaSql = "SELECT idenvio as 'ID', " +
+                "dni_cliente as 'DNI', " +
+                "nombre_completo as 'Cliente', " +
+                "telefono as 'Teléfono'," +
+                " fecha_pedido as 'Fecha' FROM envios";
+        PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
+        return sentencia.executeQuery();
+    }
 
+    ResultSet consultarResumenPedidos() throws SQLException {
+        String sentenciaSql = "SELECT idenvio as 'ID'," +
+                " dni_cliente as 'DNI'," +
+                " nombre_completo as 'Cliente'," +
+                " calcular_total_envio(idenvio) as 'Total Pedido(€)'" +
+                " FROM envios";
+        PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
+        return sentencia.executeQuery();
+    }
 
+    ResultSet consultarCamisetas() throws SQLException {
+        String sentenciaSql = "SELECT idcamiseta as 'ID Camiseta'," +
+                " idenvio as 'ID Envío'," +
+                " color as 'Color'," +
+                " material as 'Material'," +
+                " talla as 'Talla'," +
+                " con_texto as 'Con Texto'," +
+                " diseno_texto as 'Texto'," +
+                " cantidad as 'Cantidad'," +
+                " precio_camiseta as 'Precio Unidad'," +
+                " (cantidad * precio_camiseta) as 'Subtotal Camisetas' FROM camiseta";
+        PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
+        return sentencia.executeQuery();
+    }
+
+    ResultSet consultarTazas() throws SQLException {
+        String sentenciaSql = "SELECT idtaza as 'ID Taza'," +
+                " idenvio as 'ID Envío'," +
+                " color as 'Color'," +
+                " material as 'Material'," +
+                " tamano as 'Tamaño'," +
+                " tipo_diseno as 'Tipo Diseño'," +
+                " metodo_diseno as 'Método'," +
+                " cantidad as 'Cantidad'," +
+                " precio_taza as 'Precio Unit.'," +
+                " (cantidad * precio_taza) as 'Subtotal Tazas' FROM taza";
+        PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
+        return sentencia.executeQuery();
+    }
+
+    ResultSet consultarLlaveros() throws SQLException {
+        String sentenciaSql = "SELECT idllavero as 'ID Llavero'," +
+                " idenvio as 'ID Envío'," +
+                " color as 'Color'," +
+                " material as 'Material'," +
+                " forma as 'Forma'," +
+                " cantidad as 'Cantidad'," +
+                " precio_llavero as 'Precio Unit.'," +
+                " (cantidad * precio_llavero) as 'Subtotal Llaveros' FROM llavero";
+        PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
+        return sentencia.executeQuery();
+    }
+
+    //configuracion
+
+    private void getPropValues() {
+        InputStream inputStream = null;
+        try {
+            Properties prop = new Properties();
+            inputStream = new FileInputStream("config.properties");
+            prop.load(inputStream);
+            ip = prop.getProperty("ip");
+            user = prop.getProperty("user");
+            password = prop.getProperty("pass");
+            adminPassword = prop.getProperty("admin");
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+        } finally {
+            try { if (inputStream != null) inputStream.close(); } catch (IOException e) { e.printStackTrace(); }
+        }
+    }
+
+    void setPropValues(String ip, String user, String pass, String adminPass) {
+        try {
+            Properties prop = new Properties();
+            prop.setProperty("ip", ip);
+            prop.setProperty("user", user);
+            prop.setProperty("pass", pass);
+            prop.setProperty("admin", adminPass);
+            OutputStream out = new FileOutputStream("config.properties");
+            prop.store(out, null);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        this.ip = ip; this.user = user; this.password = pass; this.adminPassword = adminPass;
+    }
 }
