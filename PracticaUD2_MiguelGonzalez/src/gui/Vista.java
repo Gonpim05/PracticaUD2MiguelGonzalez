@@ -61,6 +61,10 @@ public class Vista extends JFrame {
     JButton eliminarEnvioButton;
     JTable tablaEnvio;
     DatePicker datePicker;
+    private JLabel precioCamiseta;
+    private JLabel precioTaza;
+    private JLabel precioLlavero;
+    private JLabel precioTotal;
 
     // Default Table Models
     DefaultTableModel dtmCamisetas;
