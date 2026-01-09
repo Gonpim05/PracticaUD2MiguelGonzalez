@@ -3,7 +3,16 @@
   <component name="ChangeListManager">
     <list default="true" id="4a9aa6be-7b3d-40fb-9629-5e183696a760" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bdd_regalosPers.sql" beforeDir="false" afterPath="$PROJECT_DIR$/bdd_regalosPers.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/Controlador.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Controlador.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/Modelo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Modelo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/OptionDialog.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/OptionDialog.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/OptionDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/OptionDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/Vista.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Vista.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/Vista.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Vista.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/Principal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Principal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/Util.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -34,6 +43,7 @@
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -53,6 +63,26 @@
         </RuleState>
       </list>
     </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="Principal" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="main.Principal" />
+      <module name="PracticaUD2_MiguelGonzalez" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Principal" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -78,6 +108,11 @@
       <workItem from="1767625422708" duration="1959000" />
       <workItem from="1767773300135" duration="14348000" />
       <workItem from="1767805852346" duration="3606000" />
+      <workItem from="1767809788437" duration="49000" />
+      <workItem from="1767856422644" duration="626000" />
+      <workItem from="1767858363100" duration="13726000" />
+      <workItem from="1767885781541" duration="3124000" />
+      <workItem from="1767944285736" duration="12259000" />
     </task>
     <servers />
   </component>

@@ -1,6 +1,8 @@
 package gui;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import gui.base.enums.*;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -9,6 +11,9 @@ public class Vista extends JFrame {
     private JPanel panel1;
     private JTabbedPane tabbedPane1;
     private final static String TITULO = "Aplicación Tienda Regalos Personalizados";
+
+    // --- DIÁLOGOS (Añadido para el controlador) ---
+    public OptionDialog optionDialog;
 
     // Camiseta
     JPanel JPanelCamiseta;
@@ -61,10 +66,10 @@ public class Vista extends JFrame {
     JButton eliminarEnvioButton;
     JTable tablaEnvio;
     DatePicker datePicker;
-    private JLabel precioCamiseta;
-    private JLabel precioTaza;
-    private JLabel precioLlavero;
-    private JLabel precioTotal;
+    JLabel precioCamiseta;
+    JLabel precioTaza;
+    JLabel precioLlavero;
+    JLabel precioTotal;
 
     // Default Table Models
     DefaultTableModel dtmCamisetas;
@@ -81,26 +86,59 @@ public class Vista extends JFrame {
     JPasswordField adminPassword;
 
     public Vista() {
-        // Llama al constructor de JFrame pasándole el título
         super(TITULO);
         initFrame();
     }
 
     public void initFrame() {
-        // Conecta el panel principal creado en el Designer
         this.setContentPane(panel1);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        // Inicializamos los modelos de tabla (DTM) antes de que se vea la ventana
-        setTableModels();
+        // --- INSTANCIACIÓN DEL DIÁLOGO ---
+        this.optionDialog = new OptionDialog(this);
 
-        // Configuramos el menú
+        // --- INICIALIZACIÓN DEL DIÁLOGO DE CONTRASEÑA Y BOTÓN VALIDATE ---
+        this.adminPasswordDialog = new JDialog(this, "Validación Admin", true);
+        this.adminPassword = new JPasswordField(20);
+        this.btnValidate = new JButton("Entrar");
+        this.btnValidate.setActionCommand("abrirOpciones");
+
+        JPanel p = new JPanel(new FlowLayout());
+        p.add(new JLabel("Contraseña:"));
+        p.add(adminPassword);
+        p.add(btnValidate);
+
+        adminPasswordDialog.add(p);
+        adminPasswordDialog.pack();
+        adminPasswordDialog.setLocationRelativeTo(this);
+
+        // --- RELLENO DE COMBOBOX ---
+        rellenarCombos();
+
+        setTableModels();
         setMenu();
 
         this.pack();
-        this.setSize(new Dimension(1000, 700)); // Ajusta según el tamaño que necesites
+        this.setSize(new Dimension(1000, 700));
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+    }
+
+    private void rellenarCombos() {
+        // Camisetas
+        colorCamisetaCB.setModel(new DefaultComboBoxModel<>(CamisetaColorENUM.values()));
+        materialCamisetaCB.setModel(new DefaultComboBoxModel<>(CamisetaMaterialENUM.values()));
+        tallaCamisetaCB.setModel(new DefaultComboBoxModel<>(CamisetaTallaENUM.values()));
+
+        // Tazas
+        colorTazaCB.setModel(new DefaultComboBoxModel<>(TazaColorENUM.values()));
+        materialTazaCB.setModel(new DefaultComboBoxModel<>(TazaMaterialENUM.values()));
+        tamañoTazaCB.setModel(new DefaultComboBoxModel<>(TazaTamañoENUM.values()));
+
+        // Llaveros
+        colorLlaveroCB.setModel(new DefaultComboBoxModel<>(LlaveroColorENUM.values()));
+        materialLlaveroCB.setModel(new DefaultComboBoxModel<>(LlaveroMaterialENUM.values()));
+        formaLlaveroCB.setModel(new DefaultComboBoxModel<>(LlaveroFormaENUM.values()));
     }
 
     private void setMenu() {
@@ -124,7 +162,6 @@ public class Vista extends JFrame {
     }
 
     private void setTableModels() {
-        // Inicializamos cada modelo y lo asignamos a su tabla correspondiente
         this.dtmCamisetas = new DefaultTableModel();
         this.tablaCamiseta.setModel(dtmCamisetas);
 

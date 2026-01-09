@@ -8,5 +8,7 @@ public class Principal {
         Modelo modelo = new Modelo();
         Vista vista = new Vista();
         Controlador controlador = new Controlador(modelo,vista);
+
+        vista.setVisible(true);
     }
 }

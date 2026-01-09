@@ -24,29 +24,34 @@ public class Modelo {
     public Connection getConexion() { return conexion; }
 
     void conectar() {
+        // Añadimos parámetros para evitar errores de SSL y zona horaria
+        String params = "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
         try {
             conexion = DriverManager.getConnection(
-                    "jdbc:mysql://" + ip + ":3306/" + dbName, user, password);
+                    "jdbc:mysql://" + ip + ":3306/" + dbName + params, user, password);
             System.out.println("Conectado con éxito a " + dbName);
         } catch (SQLException sqle) {
+            System.out.println("La base de datos no existe. Intentando crearla...");
             try {
+                // Conectamos a la raíz de MySQL para ejecutar el script SQL
                 conexion = DriverManager.getConnection(
-                        "jdbc:mysql://" + ip + ":3306/", user, password);
-                PreparedStatement statement = null;
+                        "jdbc:mysql://" + ip + ":3306/" + params, user, password);
+
                 String code = leerFichero();
-                String[] query = code.split("--");
-                for (String aQuery : query) {
+                String[] queries = code.split(";");
+                Statement statement = conexion.createStatement();
+
+                for (String aQuery : queries) {
                     if (!aQuery.trim().isEmpty()) {
-                        statement = conexion.prepareStatement(aQuery);
-                        statement.executeUpdate();
+                        statement.executeUpdate(aQuery);
                     }
                 }
-                if (statement != null) {
-                    statement.close();
-                }
+
+                statement.close();
                 conexion.setCatalog(dbName);
-                System.out.println("Base de datos creada desde el script.");
+                System.out.println("Base de datos y tablas creadas con éxito.");
             } catch (SQLException | IOException e) {
+                System.out.println("ERROR CRÍTICO: No se pudo conectar ni crear la DB.");
                 e.printStackTrace();
             }
         }
@@ -75,9 +80,8 @@ public class Modelo {
         }
     }
 
-    // insertar
+    // --- MÉTODOS DE INSERCIÓN ---
 
-    // AÑADIDO: Método para insertar el envío y obtener su ID (estilo profesora)
     public int insertarEnvio(String dni, String nombre, String tfn, String comentario) {
         String sentenciaSql = "INSERT INTO envios (dni_cliente, nombre_completo, telefono, comentario) VALUES (?, ?, ?, ?)";
         PreparedStatement sentencia = null;
@@ -106,7 +110,7 @@ public class Modelo {
 
     void insertarCamiseta(int idEnvio, String color, String material, String talla,
                           boolean conTexto, String disenoTexto, int cantidad, float precio) {
-        String sentenciaSql = "INSERT INTO camiseta (idenvio, color, material, talla, con_texto, diseno_texto, cantidad, precio_camiseta) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sentenciaSql = "INSERT INTO camiseta (idenvio, color, material, talla, con_texto, diseno_texto, cantidad, precio_camisetas) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement sentencia = null;
         try {
             sentencia = conexion.prepareStatement(sentenciaSql);
@@ -129,7 +133,21 @@ public class Modelo {
     }
 
     void insertarTaza(int idEnvio, String color, String material, String tamano, String tipo_diseno, String metodo_diseno, int cantidad, float precio) {
-        String sentenciaSql = "INSERT INTO taza (idenvio, color, material, tamano, tipo_diseno, metodo_diseno, cantidad, precio_taza) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        // --- FILTRO DE SEGURIDAD PARA ENUMS ---
+        // Esto traduce lo que venga del RadioButton al valor exacto que pide tu SQL
+        if (metodo_diseno.equalsIgnoreCase("Foto") || metodo_diseno.toLowerCase().contains("foto")) {
+            metodo_diseno = "Foto";
+        } else {
+            metodo_diseno = "IA";
+        }
+
+        if (tipo_diseno.equalsIgnoreCase("Texto") || tipo_diseno.toLowerCase().contains("texto")) {
+            tipo_diseno = "Texto";
+        } else {
+            tipo_diseno = "Dibujo";
+        }
+
+        String sentenciaSql = "INSERT INTO taza (idenvio, color, material, tamano, tipo_diseno, metodo_diseno, cantidad, precio_tazas) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement sentencia = null;
         try {
             sentencia = conexion.prepareStatement(sentenciaSql);
@@ -152,7 +170,7 @@ public class Modelo {
     }
 
     void insertarLlavero(int idEnvio, String color, String material, String forma, int cantidad, float precio) {
-        String sentenciaSql = "INSERT INTO llavero (idenvio, color, material, forma, cantidad, precio_llavero) VALUES (?, ?, ?, ?, ?, ?)";
+        String sentenciaSql = "INSERT INTO llavero (idenvio, color, material, forma, cantidad, precio_llaveros) VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement sentencia = null;
         try {
             sentencia = conexion.prepareStatement(sentenciaSql);
@@ -172,7 +190,7 @@ public class Modelo {
         }
     }
 
-    // modificar
+// --- MÉTODOS DE MODIFICACIÓN ---
 
     void modificarEnvio(int idEnvio, String dni, String nombre, String tfn, String comentario) {
         String sentenciaSql = "UPDATE envios SET dni_cliente = ?, nombre_completo = ?, telefono = ?, comentario = ? WHERE idenvio = ?";
@@ -195,7 +213,7 @@ public class Modelo {
     }
 
     void modificarCamiseta(String color, String material, String talla, boolean conTexto, String diseno_texto, int cantidad, float precio, int idCamiseta) {
-        String sentenciaSql = "UPDATE camiseta SET color = ?, material = ?, talla = ?, con_texto = ?, diseno_texto = ?, cantidad = ?, precio_camiseta = ? WHERE idcamiseta = ?";
+        String sentenciaSql = "UPDATE camiseta SET color = ?, material = ?, talla = ?, con_texto = ?, diseno_texto = ?, cantidad = ?, precio_camisetas = ? WHERE idcamiseta = ?";
         PreparedStatement sentencia = null;
         try {
             sentencia = conexion.prepareStatement(sentenciaSql);
@@ -218,7 +236,7 @@ public class Modelo {
     }
 
     void modificarTaza(String color, String material, String tamano, String tipo_diseno, String metodo_diseno, int cantidad, float precio_taza, int idTaza){
-        String sentenciaSql = "UPDATE taza SET color = ?, material = ?, tamano = ?, tipo_diseno = ?,  metodo_diseno = ?, cantidad = ?, precio_taza = ? WHERE idtaza = ?";
+        String sentenciaSql = "UPDATE taza SET color = ?, material = ?, tamano = ?, tipo_diseno = ?,  metodo_diseno = ?, cantidad = ?, precio_tazas = ? WHERE idtaza = ?";
         PreparedStatement sentencia = null;
         try {
             sentencia = conexion.prepareStatement(sentenciaSql);
@@ -241,7 +259,7 @@ public class Modelo {
     }
 
     void modificarLlavero(String color, String material, String forma, int cantidad, float precio_llavero, int idLlavero){
-        String sentenciaSql = "UPDATE llavero SET color = ?, material = ?, forma = ?, cantidad = ?, precio_llavero = ? WHERE idllavero = ?";
+        String sentenciaSql = "UPDATE llavero SET color = ?, material = ?, forma = ?, cantidad = ?, precio_llaveros = ? WHERE idllavero = ?";
         PreparedStatement sentencia = null;
         try {
             sentencia = conexion.prepareStatement(sentenciaSql);
@@ -261,7 +279,7 @@ public class Modelo {
         }
     }
 
-    // eliminar
+// --- MÉTODOS DE ELIMINACIÓN ---
 
     void eliminarEnvio(int idEnvio) {
         String sentenciaSql = "DELETE FROM envios WHERE idenvio = ?";
@@ -326,7 +344,6 @@ public class Modelo {
             }
         }
     }
-
     // consulta
 
     ResultSet consultarEnvios() throws SQLException {
@@ -358,8 +375,7 @@ public class Modelo {
                 " con_texto as 'Con Texto'," +
                 " diseno_texto as 'Texto'," +
                 " cantidad as 'Cantidad'," +
-                " precio_camiseta as 'Precio Unidad'," +
-                " (cantidad * precio_camiseta) as 'Subtotal Camisetas' FROM camiseta";
+                " precio_camisetas as 'Precio Unidad' FROM camiseta";
         PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
         return sentencia.executeQuery();
     }
@@ -373,8 +389,8 @@ public class Modelo {
                 " tipo_diseno as 'Tipo Diseño'," +
                 " metodo_diseno as 'Método'," +
                 " cantidad as 'Cantidad'," +
-                " precio_taza as 'Precio Unit.'," +
-                " (cantidad * precio_taza) as 'Subtotal Tazas' FROM taza";
+                " precio_tazas as 'Precio Unidad' FROM taza" ;
+
         PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
         return sentencia.executeQuery();
     }
@@ -386,8 +402,8 @@ public class Modelo {
                 " material as 'Material'," +
                 " forma as 'Forma'," +
                 " cantidad as 'Cantidad'," +
-                " precio_llavero as 'Precio Unit.'," +
-                " (cantidad * precio_llavero) as 'Subtotal Llaveros' FROM llavero";
+                " precio_llaveros as 'Precio Unidad'FROM llavero";
+
         PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
         return sentencia.executeQuery();
     }

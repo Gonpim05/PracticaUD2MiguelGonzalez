@@ -8,8 +8,8 @@ CREATE TABLE envios (
     nombre_completo VARCHAR(100) NOT NULL,
     telefono VARCHAR(15) NOT NULL,
     comentario TEXT,
-    fecha_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    estado ENUM('Pendiente', 'Enviado', 'Entregado') DEFAULT 'Pendiente' -- Añadido para que la vista funcione
+    fecha_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   
 );
 
 -- (Tus tablas de camiseta, taza y llavero se quedan igual que las tenías)
@@ -22,7 +22,7 @@ CREATE TABLE camiseta (
     con_texto BOOLEAN, 
     diseno_texto VARCHAR(255), 
     cantidad INT NOT NULL, 
-    precio_camiseta DECIMAL(8,2) DEFAULT 15.50,
+    precio_camisetas DECIMAL(8,2),
     FOREIGN KEY (idenvio) REFERENCES envios(idenvio) ON DELETE CASCADE
 );
 
@@ -35,7 +35,7 @@ CREATE TABLE taza (
     tipo_diseno ENUM('Texto', 'Dibujo') NOT NULL,
     metodo_diseno ENUM('Foto', 'IA') NOT NULL,
     cantidad INT NOT NULL, 
-    precio_taza DECIMAL(8,2) DEFAULT 10.00,
+    precio_tazas DECIMAL(8,2),
     FOREIGN KEY (idenvio) REFERENCES envios(idenvio) ON DELETE CASCADE
 );
 
@@ -46,7 +46,7 @@ CREATE TABLE llavero (
     material ENUM('Plastico','Metal') NOT NULL,
     forma ENUM('Redondo','Cuadrado') NOT NULL,
     cantidad INT NOT NULL, 
-    precio_llavero DECIMAL(8,2) DEFAULT 5.00,
+    precio_llaveros DECIMAL(8,2),
     FOREIGN KEY (idenvio) REFERENCES envios(idenvio) ON DELETE CASCADE
 );
 
