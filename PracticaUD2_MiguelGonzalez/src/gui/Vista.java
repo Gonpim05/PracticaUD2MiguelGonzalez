@@ -69,7 +69,6 @@ public class Vista extends JFrame {
     JLabel precioCamiseta;
     JLabel precioTaza;
     JLabel precioLlavero;
-    JLabel precioTotal;
 
     // Default Table Models
     DefaultTableModel dtmCamisetas;
@@ -79,6 +78,7 @@ public class Vista extends JFrame {
 
     // Menu y Diálogos
     JMenuItem itemOpciones;
+    JMenuItem itemTicket;
     JMenuItem itemDesconectar;
     JMenuItem itemSalir;
     JDialog adminPasswordDialog;
@@ -151,11 +151,15 @@ public class Vista extends JFrame {
         itemDesconectar = new JMenuItem("Desconectar");
         itemDesconectar.setActionCommand("Desconectar");
 
+        itemTicket = new JMenuItem("Ticket");
+        itemTicket.setActionCommand("Ticket");
+
         itemSalir = new JMenuItem("Salir");
         itemSalir.setActionCommand("Salir");
 
         menu.add(itemOpciones);
         menu.add(itemDesconectar);
+        menu.add(itemTicket);
         menu.add(itemSalir);
         mbBar.add(menu);
         this.setJMenuBar(mbBar);

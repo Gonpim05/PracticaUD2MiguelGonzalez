@@ -17,14 +17,18 @@ public class Modelo {
         getPropValues();
     }
 
-    public String getIp() { return ip; }
-    public String getUser() { return user; }
-    public String getPassword() { return password; }
-    public String getAdminPassword() { return adminPassword; }
-    public Connection getConexion() { return conexion; }
+    public String getIp() {
+        return ip; }
+    public String getUser() {
+        return user; }
+    public String getPassword() {
+        return password; }
+    public String getAdminPassword() {
+        return adminPassword; }
+    public Connection getConexion() {
+        return conexion; }
 
     void conectar() {
-        // Añadimos parámetros para evitar errores de SSL y zona horaria
         String params = "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
         try {
             conexion = DriverManager.getConnection(
@@ -80,30 +84,25 @@ public class Modelo {
         }
     }
 
-    // --- MÉTODOS DE INSERCIÓN ---
 
-    public int insertarEnvio(String dni, String nombre, String tfn, String comentario) {
-        String sentenciaSql = "INSERT INTO envios (dni_cliente, nombre_completo, telefono, comentario) VALUES (?, ?, ?, ?)";
-        PreparedStatement sentencia = null;
+
+    public int insertarEnvio(String dni, String nombre, String tel, String coment, java.sql.Date fecha) {
         int idGenerado = -1;
-        try {
-            sentencia = conexion.prepareStatement(sentenciaSql, Statement.RETURN_GENERATED_KEYS);
-            sentencia.setString(1, dni);
-            sentencia.setString(2, nombre);
-            sentencia.setString(3, tfn);
-            sentencia.setString(4, comentario);
-            sentencia.executeUpdate();
 
-            ResultSet rs = sentencia.getGeneratedKeys();
-            if (rs.next()) {
-                idGenerado = rs.getInt(1);
-            }
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-        } finally {
-            if (sentencia != null) {
-                try { sentencia.close(); } catch (SQLException e) { e.printStackTrace(); }
-            }
+        String sql = "INSERT INTO envios (dni_cliente, nombre_completo, telefono, comentario, fecha_pedido) VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, dni);
+            ps.setString(2, nombre);
+            ps.setString(3, tel);
+            ps.setString(4, coment);
+            ps.setDate(5, fecha); // Enviamos la fecha elegida
+
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) idGenerado = rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return idGenerado;
     }
@@ -133,8 +132,7 @@ public class Modelo {
     }
 
     void insertarTaza(int idEnvio, String color, String material, String tamano, String tipo_diseno, String metodo_diseno, int cantidad, float precio) {
-        // --- FILTRO DE SEGURIDAD PARA ENUMS ---
-        // Esto traduce lo que venga del RadioButton al valor exacto que pide tu SQL
+
         if (metodo_diseno.equalsIgnoreCase("Foto") || metodo_diseno.toLowerCase().contains("foto")) {
             metodo_diseno = "Foto";
         } else {
@@ -440,5 +438,59 @@ public class Modelo {
             ex.printStackTrace();
         }
         this.ip = ip; this.user = user; this.password = pass; this.adminPassword = adminPass;
+    }
+
+    public float obtenerPresupuestoTotal(int idEnvio) {
+        float total = 0;
+        // La sintaxis para FUNCIONES es {? = call nombre(?)}
+        String sql = "{? = call calcular_total_envio(?)}";
+
+        try (CallableStatement cs = conexion.prepareCall(sql)) {
+            // El parámetro 1 es el valor de RETORNO (el total)
+            cs.registerOutParameter(1, java.sql.Types.DECIMAL);
+
+            // El parámetro 2 es la entrada (el ID)
+            cs.setInt(2, idEnvio);
+
+            cs.execute();
+
+            // Recogemos el resultado del parámetro 1
+            total = cs.getFloat(1);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return total;
+    }
+
+    public String[] obtenerDatosTicket(int idEnvio) {
+        // Array para guardar: DNI, Nombre, Fecha y el Total (calculado por el procedimiento)
+        String[] datos = new String[4];
+
+        // 1. Consulta para obtener los datos básicos del envío
+        String sqlDatos = "SELECT dni_cliente, nombre_completo, fecha_pedido FROM envios WHERE idenvio = ?";
+
+        try {
+            // Preparar la consulta normal
+            PreparedStatement ps = conexion.prepareStatement(sqlDatos);
+            ps.setInt(1, idEnvio);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                datos[0] = rs.getString("dni_cliente");
+                datos[1] = rs.getString("nombre_completo");
+                datos[2] = rs.getString("fecha_pedido");
+
+                // 2. Llamamos al procedimiento almacenado para obtener el total de este envío
+                // Reutilizamos el método que creamos antes para no repetir código
+                float totalCalculado = obtenerPresupuestoTotal(idEnvio);
+                datos[3] = String.format("%.2f", totalCalculado); // Formateamos a 2 decimales
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener datos para el ticket: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return datos;
     }
 }

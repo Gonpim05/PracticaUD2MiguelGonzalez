@@ -8,6 +8,7 @@ import util.Util;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
+import java.io.PrintWriter;
 import java.sql.*;
 import java.util.Vector;
 import java.io.IOException;
@@ -66,6 +67,7 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         vista.itemDesconectar.addActionListener(listener);
         vista.itemSalir.addActionListener(listener);
         vista.btnValidate.addActionListener(listener);
+        vista.itemTicket.addActionListener(listener);
     }
 
     private void addWindowListeners(WindowListener listener){
@@ -193,14 +195,30 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                 break;
 
             case "anadirEnvio":
+                java.time.LocalDate fechaLocal = vista.datePicker.getDate();
                 if (comprobarEnvioVacio()) {
-                    Util.showErrorAlert("Rellena el cliente");
+                    Util.showErrorAlert("Rellena todos los campos del cliente.");
+                } else if (fechaLocal == null) {
+                    Util.showErrorAlert("Por favor, selecciona una fecha para el pedido.");
                 } else {
-                    modelo.insertarEnvio(vista.DNITextField.getText(), vista.nombreTextField.getText(), vista.tfnTextField.getText(), vista.comentarioTextField.getText());
+
+                    java.sql.Date fechaSQL = java.sql.Date.valueOf(fechaLocal);
+
+                    modelo.insertarEnvio(
+                            vista.DNITextField.getText(),
+                            vista.nombreTextField.getText(),
+                            vista.tfnTextField.getText(),
+                            vista.comentarioTextField.getText(),
+                            fechaSQL
+                    );
+
                     refrescarEnvio();
                     borrarCamposEnvio();
+
+                    vista.datePicker.clear();
                 }
                 break;
+
 
             case "modificarEnvio":
                 try {
@@ -321,6 +339,35 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
 
             case "Salir":
                 System.exit(0);
+                break;
+
+            case "Ticket":
+                int filaSeleccionada = vista.tablaEnvio.getSelectedRow();
+
+                if (filaSeleccionada == -1) {
+                    JOptionPane.showMessageDialog(null, "Selecciona un envio de la tabla para generar su ticket.");
+                } else {
+                    try {
+                        int idEnvio = (int) vista.tablaEnvio.getValueAt(filaSeleccionada, 0);
+                        String[] datosTicket = modelo.obtenerDatosTicket(idEnvio);
+                        PrintWriter writer = new PrintWriter("Ticket_Pedido_" + idEnvio + ".txt");
+
+                        writer.println("       TICKET DE VENTA     ");
+                        writer.println("ID PEDIDO: " + idEnvio);
+                        writer.println("FECHA:     " + datosTicket[2]);
+                        writer.println("CLIENTE:   " + datosTicket[1]);
+                        writer.println("DNI:       " + datosTicket[0]);
+                        writer.println("TOTAL " + datosTicket[3] + " €");
+                        writer.close();
+
+                        // 5. Avisar al usuario
+                        JOptionPane.showMessageDialog(null, "Ticket generado con éxito en la carpeta del proyecto.");
+
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(null, "Error al generar el ticket: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                }
                 break;
         }
     }

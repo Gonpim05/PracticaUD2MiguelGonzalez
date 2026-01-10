@@ -59,16 +59,16 @@ BEGIN
     DECLARE total DECIMAL(10,2) DEFAULT 0;
     DECLARE t_cam, t_taz, t_lla DECIMAL(10,2) DEFAULT 0;
     
-    SELECT IFNULL(SUM(cantidad * precio_camiseta), 0) INTO t_cam FROM camiseta WHERE idenvio = p_idenvio;
-    SELECT IFNULL(SUM(cantidad * precio_taza), 0) INTO t_taz FROM taza WHERE idenvio = p_idenvio;
-    SELECT IFNULL(SUM(cantidad * precio_llavero), 0) INTO t_lla FROM llavero WHERE idenvio = p_idenvio;
+    SELECT IFNULL(SUM(cantidad * precio_camisetas), 0) INTO t_cam FROM camiseta WHERE idenvio = p_idenvio;
+    SELECT IFNULL(SUM(cantidad * precio_tazas), 0) INTO t_taz FROM taza WHERE idenvio = p_idenvio;
+    SELECT IFNULL(SUM(cantidad * precio_llaveros), 0) INTO t_lla FROM llavero WHERE idenvio = p_idenvio;
     
     SET total = t_cam + t_taz + t_lla;
     RETURN total;
 END //
 DELIMITER ;
 
--- Tu procedimiento (Perfecto)
+-- Tu procedimiento
 DELIMITER //
 CREATE PROCEDURE sp_registrar_envio_basico(
     IN p_dni VARCHAR(9), 

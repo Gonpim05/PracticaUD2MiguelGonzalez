@@ -1,0 +1,6 @@
+       TICKET DE VENTA     
+ID PEDIDO: 3
+FECHA:     2026-01-10 14:19:41.0
+CLIENTE:   jryjyfj
+DNI:       jfyjfj
+TOTAL 10,00 €
