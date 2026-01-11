@@ -19,7 +19,6 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
     private Vista vista;
     boolean refrescar;
 
-    // --- 1. DECLARACIÓN DE GRUPOS COMO VARIABLES DE CLASE (PARA PODER LIMPIARLOS LUEGO) ---
     private ButtonGroup grupoCamiseta;
     private ButtonGroup grupoTaza;
 
@@ -36,7 +35,6 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
             refrescarTodo();
             iniciar();
 
-            // --- 2. INICIALIZACIÓN DE GRUPOS (HACE QUE LOS RADIO BUTTONS SEAN EXCLUYENTES) ---
             grupoCamiseta = new ButtonGroup();
             grupoCamiseta.add(vista.siRadioButton);
             grupoCamiseta.add(vista.noRadioButton);
@@ -429,7 +427,6 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         } catch (SQLException e) {}
     }
 
-    // --- CONSTRUIR MODELO (MUESTRA TODAS LAS COLUMNAS QUE VENGA EN EL RESULTSET) ---
     private DefaultTableModel construirTableModel(ResultSet rs, DefaultTableModel dtm) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         Vector<String> columnNames = new Vector<>();
@@ -475,28 +472,62 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         vista.precioLlavero.setText("");
     }
 
-    private boolean comprobarEnvioVacio() { return vista.DNITextField.getText().isEmpty(); }
-    private boolean comprobarCamisetaVacia() { return vista.precioCamiseta.getText().isEmpty(); }
-    private boolean comprobarTazaVacia() { return vista.precioTaza.getText().isEmpty(); }
-    private boolean comprobarLlaveroVacio() { return vista.precioLlavero.getText().isEmpty(); }
+    private boolean comprobarEnvioVacio() {
+        return vista.DNITextField.getText().isEmpty();
+    }
+    private boolean comprobarCamisetaVacia() {
+        return vista.precioCamiseta.getText().isEmpty();
+    }
+    private boolean comprobarTazaVacia() {
+        return vista.precioTaza.getText().isEmpty();
+    }
+    private boolean comprobarLlaveroVacio() {
+        return vista.precioLlavero.getText().isEmpty();
+    }
 
     private String obtenerTipoDisenoTaza() {
+
         if (vista.textoRadioButton.isSelected()) return "Texto";
+
         if (vista.dibujoRadioButton.isSelected()) return "Dibujo";
+
         if (vista.fotoRadioButton.isSelected()) return "Foto";
+
         if (vista.inteligenciaArtificialRadioButton.isSelected()) return "IA";
         return "Otro";
     }
 
-    @Override public void windowClosing(WindowEvent e) { System.exit(0); }
-    @Override public void itemStateChanged(ItemEvent e) {}
-    @Override public void windowOpened(WindowEvent e) {}
-    @Override public void windowClosed(WindowEvent e) {}
-    @Override public void windowIconified(WindowEvent e) {}
-    @Override public void windowDeiconified(WindowEvent e) {}
-    @Override public void windowActivated(WindowEvent e) {}
-    @Override public void windowDeactivated(WindowEvent e) {}
-    @Override public void valueChanged(ListSelectionEvent e) {}
-    private void addItemListeners(Controlador c) {}
-    private void addWindowListeners(Controlador c) {}
+    @Override public void windowClosing(WindowEvent e) {
+        System.exit(0);
+    }
+    @Override public void itemStateChanged(ItemEvent e) {
+
+    }
+    @Override public void windowOpened(WindowEvent e) {
+
+    }
+    @Override public void windowClosed(WindowEvent e) {
+
+    }
+    @Override public void windowIconified(WindowEvent e) {
+
+    }
+    @Override public void windowDeiconified(WindowEvent e) {
+
+    }
+    @Override public void windowActivated(WindowEvent e) {
+
+    }
+    @Override public void windowDeactivated(WindowEvent e) {
+
+    }
+    @Override public void valueChanged(ListSelectionEvent e) {
+
+    }
+    private void addItemListeners(Controlador c) {
+
+    }
+    private void addWindowListeners(Controlador c) {
+
+    }
 }

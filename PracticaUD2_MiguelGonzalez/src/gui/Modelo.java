@@ -188,7 +188,7 @@ public class Modelo {
         }
     }
 
-// --- MÉTODOS DE MODIFICACIÓN ---
+
 
     void modificarEnvio(int idEnvio, String dni, String nombre, String tfn, String comentario) {
         String sentenciaSql = "UPDATE envios SET dni_cliente = ?, nombre_completo = ?, telefono = ?, comentario = ? WHERE idenvio = ?";
@@ -277,7 +277,7 @@ public class Modelo {
         }
     }
 
-// --- MÉTODOS DE ELIMINACIÓN ---
+
 
     void eliminarEnvio(int idEnvio) {
         String sentenciaSql = "DELETE FROM envios WHERE idenvio = ?";
@@ -412,7 +412,6 @@ public class Modelo {
 
     public float obtenerPresupuestoTotal(int idEnvio) {
         float total = 0;
-        // La sintaxis para FUNCIONES es {? = call nombre(?)}
         String sql = "{? = call calcular_total_envio(?)}";
 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
@@ -434,14 +433,14 @@ public class Modelo {
     }
 
     public String[] obtenerDatosTicket(int idEnvio) {
-        // Array para guardar: DNI, Nombre, Fecha y el Total (calculado por el procedimiento)
+
         String[] datos = new String[4];
 
-        // 1. Consulta para obtener los datos básicos del envío
+
         String sqlDatos = "SELECT dni_cliente, nombre_completo, fecha_pedido FROM envios WHERE idenvio = ?";
 
         try {
-            // Preparar la consulta normal
+
             PreparedStatement ps = conexion.prepareStatement(sqlDatos);
             ps.setInt(1, idEnvio);
             ResultSet rs = ps.executeQuery();
@@ -451,10 +450,9 @@ public class Modelo {
                 datos[1] = rs.getString("nombre_completo");
                 datos[2] = rs.getString("fecha_pedido");
 
-                // 2. Llamamos al procedimiento almacenado para obtener el total de este envío
-                // Reutilizamos el método que creamos antes para no repetir código
+
                 float totalCalculado = obtenerPresupuestoTotal(idEnvio);
-                datos[3] = String.format("%.2f", totalCalculado); // Formateamos a 2 decimales
+                datos[3] = String.format("%.2f", totalCalculado);
             }
         } catch (SQLException e) {
             System.err.println("Error al obtener datos para el ticket: " + e.getMessage());

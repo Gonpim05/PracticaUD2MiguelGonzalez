@@ -1,5 +1,3 @@
-DROP DATABASE IF EXISTS bdd_regalosPers;
-CREATE DATABASE bdd_regalosPers;
 USE bdd_regalosPers;
 
 CREATE TABLE envios (
@@ -12,7 +10,6 @@ CREATE TABLE envios (
    
 );
 
--- (Tus tablas de camiseta, taza y llavero se quedan igual que las tenías)
 CREATE TABLE camiseta (
     idcamiseta INT AUTO_INCREMENT PRIMARY KEY,
     idenvio INT,
@@ -50,7 +47,6 @@ CREATE TABLE llavero (
     FOREIGN KEY (idenvio) REFERENCES envios(idenvio) ON DELETE CASCADE
 );
 
--- Tu función (Perfecta)
 DELIMITER //
 CREATE FUNCTION calcular_total_envio(p_idenvio INT) 
 RETURNS DECIMAL(10,2)
@@ -68,7 +64,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- Tu procedimiento
 DELIMITER //
 CREATE PROCEDURE sp_registrar_envio_basico(
     IN p_dni VARCHAR(9), 

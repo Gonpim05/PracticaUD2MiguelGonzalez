@@ -8,8 +8,7 @@
   <component name="ChangeListManager">
     <list default="true" id="4a9aa6be-7b3d-40fb-9629-5e183696a760" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Ticket_Pedido_2.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Ticket_Pedido_3.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bdd_regalosPers.sql" beforeDir="false" afterPath="$PROJECT_DIR$/bdd_regalosPers.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/Controlador.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Controlador.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/Modelo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Modelo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/Vista.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Vista.java" afterDir="false" />
@@ -130,7 +129,8 @@
       <workItem from="1767944285736" duration="12371000" />
       <workItem from="1767961738394" duration="1393000" />
       <workItem from="1768043312846" duration="6240000" />
-      <workItem from="1768143945524" duration="3247000" />
+      <workItem from="1768143945524" duration="3391000" />
+      <workItem from="1768167310045" duration="245000" />
     </task>
     <servers />
   </component>

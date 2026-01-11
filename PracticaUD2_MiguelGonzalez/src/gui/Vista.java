@@ -12,7 +12,6 @@ public class Vista extends JFrame {
     private JTabbedPane tabbedPane1;
     private final static String TITULO = "Aplicación Tienda Regalos Personalizados";
 
-    // --- DIÁLOGOS (Añadido para el controlador) ---
     public OptionDialog optionDialog;
 
     // Camiseta
@@ -96,10 +95,10 @@ public class Vista extends JFrame {
         this.setContentPane(panel1);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        // --- INSTANCIACIÓN DEL DIÁLOGO ---
+
         this.optionDialog = new OptionDialog(this);
 
-        // --- INICIALIZACIÓN DEL DIÁLOGO DE CONTRASEÑA Y BOTÓN VALIDATE ---
+
         this.adminPasswordDialog = new JDialog(this, "Validación Admin", true);
         this.adminPassword = new JPasswordField(20);
         this.btnValidate = new JButton("Entrar");
@@ -114,7 +113,7 @@ public class Vista extends JFrame {
         adminPasswordDialog.pack();
         adminPasswordDialog.setLocationRelativeTo(this);
 
-        // --- RELLENO DE COMBOBOX ---
+
         rellenarCombos();
 
         setTableModels();
