@@ -1,6 +1,0 @@
-       TICKET DE VENTA     
-ID PEDIDO: 2
-FECHA:     2026-01-10 13:39:47.0
-CLIENTE:   uyfuyf
-DNI:       gygyiv
-TOTAL 60,00 €

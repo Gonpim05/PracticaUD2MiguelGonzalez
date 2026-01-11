@@ -345,62 +345,32 @@ public class Modelo {
     // consulta
 
     ResultSet consultarEnvios() throws SQLException {
-        String sentenciaSql = "SELECT idenvio as 'ID', " +
-                "dni_cliente as 'DNI', " +
-                "nombre_completo as 'Cliente', " +
-                "telefono as 'Teléfono'," +
-                " fecha_pedido as 'Fecha' FROM envios";
+        String sentenciaSql = "SELECT * FROM envios";
         PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
         return sentencia.executeQuery();
     }
 
     ResultSet consultarResumenPedidos() throws SQLException {
-        String sentenciaSql = "SELECT idenvio as 'ID'," +
-                " dni_cliente as 'DNI'," +
-                " nombre_completo as 'Cliente'," +
-                " calcular_total_envio(idenvio) as 'Total Pedido(€)'" +
-                " FROM envios";
+        String sentenciaSql = "SELECT * FROM envios";
         PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
         return sentencia.executeQuery();
     }
 
     ResultSet consultarCamisetas() throws SQLException {
-        String sentenciaSql = "SELECT idcamiseta as 'ID Camiseta'," +
-                " idenvio as 'ID Envío'," +
-                " color as 'Color'," +
-                " material as 'Material'," +
-                " talla as 'Talla'," +
-                " con_texto as 'Con Texto'," +
-                " diseno_texto as 'Texto'," +
-                " cantidad as 'Cantidad'," +
-                " precio_camisetas as 'Precio Unidad' FROM camiseta";
+        String sentenciaSql = "SELECT * FROM camiseta";
         PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
         return sentencia.executeQuery();
     }
 
     ResultSet consultarTazas() throws SQLException {
-        String sentenciaSql = "SELECT idtaza as 'ID Taza'," +
-                " idenvio as 'ID Envío'," +
-                " color as 'Color'," +
-                " material as 'Material'," +
-                " tamano as 'Tamaño'," +
-                " tipo_diseno as 'Tipo Diseño'," +
-                " metodo_diseno as 'Método'," +
-                " cantidad as 'Cantidad'," +
-                " precio_tazas as 'Precio Unidad' FROM taza" ;
+        String sentenciaSql = "SELECT * FROM taza" ;
 
         PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
         return sentencia.executeQuery();
     }
 
     ResultSet consultarLlaveros() throws SQLException {
-        String sentenciaSql = "SELECT idllavero as 'ID Llavero'," +
-                " idenvio as 'ID Envío'," +
-                " color as 'Color'," +
-                " material as 'Material'," +
-                " forma as 'Forma'," +
-                " cantidad as 'Cantidad'," +
-                " precio_llaveros as 'Precio Unidad'FROM llavero";
+        String sentenciaSql = "SELECT * FROM llavero";
 
         PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
         return sentencia.executeQuery();

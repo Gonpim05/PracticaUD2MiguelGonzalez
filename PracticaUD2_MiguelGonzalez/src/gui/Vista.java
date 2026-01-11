@@ -85,6 +85,8 @@ public class Vista extends JFrame {
     JButton btnValidate;
     JPasswordField adminPassword;
 
+
+
     public Vista() {
         super(TITULO);
         initFrame();

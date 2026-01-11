@@ -19,6 +19,10 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
     private Vista vista;
     boolean refrescar;
 
+    // --- 1. DECLARACIÓN DE GRUPOS COMO VARIABLES DE CLASE (PARA PODER LIMPIARLOS LUEGO) ---
+    private ButtonGroup grupoCamiseta;
+    private ButtonGroup grupoTaza;
+
     public Controlador(Modelo modelo, Vista vista) {
         this.modelo=modelo;
         this.vista=vista;
@@ -31,6 +35,18 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
             addWindowListeners(this);
             refrescarTodo();
             iniciar();
+
+            // --- 2. INICIALIZACIÓN DE GRUPOS (HACE QUE LOS RADIO BUTTONS SEAN EXCLUYENTES) ---
+            grupoCamiseta = new ButtonGroup();
+            grupoCamiseta.add(vista.siRadioButton);
+            grupoCamiseta.add(vista.noRadioButton);
+
+            grupoTaza = new ButtonGroup();
+            grupoTaza.add(vista.textoRadioButton);
+            grupoTaza.add(vista.dibujoRadioButton);
+            grupoTaza.add(vista.fotoRadioButton);
+            grupoTaza.add(vista.inteligenciaArtificialRadioButton);
+
         } else {
             Util.showErrorAlert("Error de conexión con la base de datos.");
         }
@@ -103,7 +119,6 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         vista.slider3.setPaintTicks(true);
         vista.slider3.setPaintLabels(true);
 
-        // --- LÓGICA DE MULTIPLICACIÓN SIMPLE PARA SLIDERS ---
         vista.slider1.addChangeListener(e -> {
             float total = 15.0f * vista.slider1.getValue();
             vista.precioCamiseta.setText(String.valueOf(total));
@@ -139,10 +154,14 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                         vista.colorTazaCB.setSelectedItem(vista.tablaTaza.getValueAt(row, 2).toString());
                         vista.materialTazaCB.setSelectedItem(vista.tablaTaza.getValueAt(row, 3).toString());
                         vista.tamañoTazaCB.setSelectedItem(vista.tablaTaza.getValueAt(row, 4).toString());
+
+                        // --- CARGA DE RADIO BUTTONS DE TAZA AL SELECCIONAR FILA ---
                         String tipoDiseno = vista.tablaTaza.getValueAt(row, 5).toString();
                         if(tipoDiseno.equals("Texto")) vista.textoRadioButton.setSelected(true);
                         else if(tipoDiseno.equals("Dibujo")) vista.dibujoRadioButton.setSelected(true);
                         else if(tipoDiseno.equals("Foto")) vista.fotoRadioButton.setSelected(true);
+                        else if(tipoDiseno.equals("IA")) vista.inteligenciaArtificialRadioButton.setSelected(true);
+
                         vista.slider2.setValue(Integer.parseInt(vista.tablaTaza.getValueAt(row, 7).toString()));
                         vista.precioTaza.setText(vista.tablaTaza.getValueAt(row, 8).toString());
                     }
@@ -159,6 +178,15 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                         vista.DNITextField.setText(vista.tablaEnvio.getValueAt(row, 1).toString());
                         vista.nombreTextField.setText(vista.tablaEnvio.getValueAt(row, 2).toString());
                         vista.tfnTextField.setText(vista.tablaEnvio.getValueAt(row, 3).toString());
+
+                        // --- 3. CARGA DE FECHA EN EL DATEPICKER AL SELECCIONAR CLIENTE ---
+                        Object fechaValor = vista.tablaEnvio.getValueAt(row, 4);
+                        if (fechaValor != null) {
+                            try {
+                                java.time.LocalDate ld = java.time.LocalDate.parse(fechaValor.toString().split(" ")[0]);
+                                vista.datePicker.setDate(ld);
+                            } catch (Exception ex) {}
+                        }
                     }
                 }
             }
@@ -201,9 +229,7 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                 } else if (fechaLocal == null) {
                     Util.showErrorAlert("Por favor, selecciona una fecha para el pedido.");
                 } else {
-
                     java.sql.Date fechaSQL = java.sql.Date.valueOf(fechaLocal);
-
                     modelo.insertarEnvio(
                             vista.DNITextField.getText(),
                             vista.nombreTextField.getText(),
@@ -211,14 +237,11 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                             vista.comentarioTextField.getText(),
                             fechaSQL
                     );
-
                     refrescarEnvio();
                     borrarCamposEnvio();
-
                     vista.datePicker.clear();
                 }
                 break;
-
 
             case "modificarEnvio":
                 try {
@@ -343,7 +366,6 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
 
             case "Ticket":
                 int filaSeleccionada = vista.tablaEnvio.getSelectedRow();
-
                 if (filaSeleccionada == -1) {
                     JOptionPane.showMessageDialog(null, "Selecciona un envio de la tabla para generar su ticket.");
                 } else {
@@ -351,7 +373,6 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                         int idEnvio = (int) vista.tablaEnvio.getValueAt(filaSeleccionada, 0);
                         String[] datosTicket = modelo.obtenerDatosTicket(idEnvio);
                         PrintWriter writer = new PrintWriter("Ticket_Pedido_" + idEnvio + ".txt");
-
                         writer.println("       TICKET DE VENTA     ");
                         writer.println("ID PEDIDO: " + idEnvio);
                         writer.println("FECHA:     " + datosTicket[2]);
@@ -359,10 +380,7 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                         writer.println("DNI:       " + datosTicket[0]);
                         writer.println("TOTAL " + datosTicket[3] + " €");
                         writer.close();
-
-                        // 5. Avisar al usuario
                         JOptionPane.showMessageDialog(null, "Ticket generado con éxito en la carpeta del proyecto.");
-
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(null, "Error al generar el ticket: " + ex.getMessage());
                         ex.printStackTrace();
@@ -372,22 +390,46 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         }
     }
 
-    // --- MÉTODOS DE REFRESCO Y APOYO ---
     private void refrescarTodo() {
-     refrescarEnvio();
-    refrescarCamisetas();
-    refrescarTazas();
-    refrescarLlaveros(); }
-    private void refrescarEnvio() {
-        try { vista.tablaEnvio.setModel(construirTableModel(modelo.consultarEnvios(), vista.dtmEnvios));
-        } catch (SQLException e) {
+        refrescarEnvio();
+        refrescarCamisetas();
+        refrescarTazas();
+        refrescarLlaveros();
+    }
 
+    private void refrescarEnvio() {
+        try {
+            vista.tablaEnvio.setModel(construirTableModel(modelo.consultarEnvios(), vista.dtmEnvios));
+        } catch (SQLException e) {}
+    }
+
+    private void refrescarCamisetas() {
+        try {
+            vista.tablaCamiseta.setModel(construirTableModel(modelo.consultarCamisetas(), vista.dtmCamisetas));
+            // --- LIMPIEZA DE GRUPO CAMISETA AL REFRESCAR ---
+            if (grupoCamiseta != null) grupoCamiseta.clearSelection();
+        } catch (SQLException e) {}
+    }
+
+    private void refrescarTazas() {
+        try {
+            vista.tablaTaza.setModel(construirTableModel(modelo.consultarTazas(), vista.dtmTazas));
+            // --- 4. LIMPIEZA DE GRUPO TAZA AL REFRESCAR ---
+            if (grupoTaza != null) grupoTaza.clearSelection();
+            vista.precioTaza.setText("");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
-    private void refrescarCamisetas() { try { vista.tablaCamiseta.setModel(construirTableModel(modelo.consultarCamisetas(), vista.dtmCamisetas)); } catch (SQLException e) {} }
-    private void refrescarTazas() { try { vista.tablaTaza.setModel(construirTableModel(modelo.consultarTazas(), vista.dtmTazas)); } catch (SQLException e) {} }
-    private void refrescarLlaveros() { try { vista.tablaLlavero.setModel(construirTableModel(modelo.consultarLlaveros(), vista.dtmLlaveros)); } catch (SQLException e) {} }
 
+    private void refrescarLlaveros() {
+        try {
+            vista.tablaLlavero.setModel(construirTableModel(modelo.consultarLlaveros(), vista.dtmLlaveros));
+            vista.precioLlavero.setText("");
+        } catch (SQLException e) {}
+    }
+
+    // --- CONSTRUIR MODELO (MUESTRA TODAS LAS COLUMNAS QUE VENGA EN EL RESULTSET) ---
     private DefaultTableModel construirTableModel(ResultSet rs, DefaultTableModel dtm) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         Vector<String> columnNames = new Vector<>();
@@ -407,10 +449,31 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         vista.optionDialog.usuarioJTextField.setText(modelo.getUser());
     }
 
-    private void borrarCamposEnvio() { vista.DNITextField.setText(""); vista.nombreTextField.setText(""); vista.tfnTextField.setText(""); vista.comentarioTextField.setText(""); }
-    private void borrarCamposCamiseta() { vista.dieseñoJTextField.setText(""); vista.slider1.setValue(1); vista.precioCamiseta.setText(""); }
-    private void borrarCamposTaza() { vista.slider2.setValue(1); vista.precioTaza.setText(""); }
-    private void borrarCamposLlavero() { vista.slider3.setValue(1); vista.precioLlavero.setText(""); }
+    private void borrarCamposEnvio() {
+        vista.DNITextField.setText("");
+        vista.nombreTextField.setText("");
+        vista.tfnTextField.setText("");
+        vista.comentarioTextField.setText("");
+        vista.datePicker.clear(); // LIMPIA CALENDARIO
+    }
+
+    private void borrarCamposCamiseta() {
+        vista.dieseñoJTextField.setText("");
+        vista.slider1.setValue(1);
+        vista.precioCamiseta.setText("");
+        if (grupoCamiseta != null) grupoCamiseta.clearSelection(); // LIMPIA BOTONES
+    }
+
+    private void borrarCamposTaza() {
+        vista.slider2.setValue(1);
+        vista.precioTaza.setText("");
+        if (grupoTaza != null) grupoTaza.clearSelection(); // LIMPIA BOTONES
+    }
+
+    private void borrarCamposLlavero() {
+        vista.slider3.setValue(1);
+        vista.precioLlavero.setText("");
+    }
 
     private boolean comprobarEnvioVacio() { return vista.DNITextField.getText().isEmpty(); }
     private boolean comprobarCamisetaVacia() { return vista.precioCamiseta.getText().isEmpty(); }
@@ -420,7 +483,9 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
     private String obtenerTipoDisenoTaza() {
         if (vista.textoRadioButton.isSelected()) return "Texto";
         if (vista.dibujoRadioButton.isSelected()) return "Dibujo";
-        return "Foto";
+        if (vista.fotoRadioButton.isSelected()) return "Foto";
+        if (vista.inteligenciaArtificialRadioButton.isSelected()) return "IA";
+        return "Otro";
     }
 
     @Override public void windowClosing(WindowEvent e) { System.exit(0); }
